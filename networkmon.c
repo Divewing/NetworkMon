@@ -21,6 +21,19 @@ char* cmd_system(const char* command)
     return result;
 }
 
+void writetofile(char *det){
+    time_t now;
+    time(&now);
+    strcat(det," #d : ");
+    strcat(det,ctime(&now));
+    FILE *datbase;
+    datbase = fopen("data","w");
+
+    fprintf(datbase,"%s\n",det);
+   
+    fclose(datbase);
+
+}
 int main(int argc, char* argv){
 initscr(); //Creates stdscr
 mvprintw(0,0,"Downloaded :");
@@ -30,6 +43,9 @@ mvprintw(3,0,"Upload   :");
 mvprintw(2,20,"KB/s");
 mvprintw(3,20,"KB/s");
 char command[100];
+char detail[100];
+char cv[100];
+
 int hasil;
 float kb;
 float kbdlama=0.0;
@@ -37,7 +53,7 @@ float kbulama=0.0;
 float speed;
 for(;;){
     //Totaldownloaded
-    strcpy(command,"cat /sys/class/net/wlan0/statistics/rx_bytes");
+    strcpy(command,"cat /sys/class/net/wlan0/statistics/rx_bytes");    
     hasil = atoi(cmd_system(command));
     kb = hasil/1000.0;
     mvprintw(0,13,"%i",hasil);
@@ -49,6 +65,10 @@ for(;;){
         mvprintw(2,11,"%.1f",speed);
     }
     kbdlama=kb;
+    
+    sprintf(cv,"%d",hasil);
+    strcpy(detail,"#dt : ");
+    strcat(detail,cv);
     
     //Totaluploaded
     strcpy(command,"cat /sys/class/net/wlan0/statistics/tx_bytes");
@@ -66,8 +86,12 @@ for(;;){
     
     kbulama=kb;
     
-    refresh();//Refresh the number
+    sprintf(cv,"%d",hasil);
+    strcat(detail," #ut : ");
+    strcat(detail,cv);
     
+    refresh();//Refresh the number
+    writetofile(detail);
     sleep(1);//Delay 1 second
 }
 endwin();
